@@ -1,14 +1,19 @@
 <div class="card" *ngIf="loading">
-  <div class="loading">Loading product details...</div>
+  <div class="loading-indicator">
+    <div class="spinner"></div>
+    <p>Se încarcă detaliile produsului...</p>
+  </div>
 </div>
 
 <div class="card" *ngIf="error">
   <div class="error">
     <p>
-      Error loading product details. The product may have been deleted or does
-      not exist.
+      {{
+        errorMessage ||
+          "Produsul nu a fost găsit sau a apărut o eroare în încărcarea datelor."
+      }}
     </p>
-    <a [routerLink]="['/products']" class="btn">Return to Product List</a>
+    <a [routerLink]="['/products']" class="btn">Înapoi la lista de produse</a>
   </div>
 </div>
 
@@ -17,23 +22,25 @@
     <div class="product-header">
       <h2>{{ product.name }}</h2>
       <div class="product-actions">
-        <a [routerLink]="['/edit-product', product.id]" class="btn">Edit</a>
-        <button class="btn btn-danger" (click)="deleteProduct()">Delete</button>
+        <a [routerLink]="['/edit-product', product.id]" class="btn">Editare</a>
+        <button class="btn btn-danger" (click)="deleteProduct()">
+          Ștergere
+        </button>
       </div>
     </div>
 
     <div class="detail-row">
-      <span class="label">Category:</span>
+      <span class="label">Categorie:</span>
       <span class="badge badge-primary">{{ product.category }}</span>
     </div>
 
     <div class="detail-row">
-      <span class="label">Price:</span>
-      <span class="value">{{ product.price | currency }}</span>
+      <span class="label">Preț:</span>
+      <span class="value">{{ product.price | currency : "RON " }}</span>
     </div>
 
     <div class="detail-row">
-      <span class="label">In Stock:</span>
+      <span class="label">În stoc:</span>
       <span
         class="value"
         [ngClass]="{
@@ -46,22 +53,22 @@
     </div>
 
     <div class="detail-row">
-      <span class="label">Description:</span>
+      <span class="label">Descriere:</span>
       <p class="description">{{ product.description }}</p>
     </div>
 
     <div class="back-link">
       <a [routerLink]="['/products']" class="btn btn-secondary"
-        >Back to Products</a
+        >Înapoi la produse</a
       >
     </div>
   </div>
 
   <div class="card history-section">
-    <h3>Product History</h3>
+    <h3>Istoricul produsului</h3>
 
     <div *ngIf="productHistory.length === 0" class="no-history">
-      <p>No history records found for this product.</p>
+      <p>Nu există înregistrări de istoric pentru acest produs.</p>
     </div>
 
     <ul class="history-list" *ngIf="productHistory.length > 0">
@@ -69,7 +76,7 @@
         <div class="change-type">{{ change.changeType }}</div>
         <div class="change-details">
           <span class="change-field"
-            >Field changed from <strong>{{ change.oldValue }}</strong> to
+            >Câmp modificat din <strong>{{ change.oldValue }}</strong> în
             <strong>{{ change.newValue }}</strong></span
           >
           <span class="change-date">{{

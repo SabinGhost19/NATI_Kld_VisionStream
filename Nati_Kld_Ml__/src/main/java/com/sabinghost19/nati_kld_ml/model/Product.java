@@ -12,7 +12,7 @@ import java.util.UUID;
 public class Product {
 
     @PrimaryKey
-    private UUID id;
+    private Long id;
 
     @Column("name")
     private String name;
@@ -32,7 +32,7 @@ public class Product {
     public Product() {
     }
 
-    public Product(UUID id, String name, String description, BigDecimal price, Integer quantity, String category) {
+    public Product(Long id, String name, String description, BigDecimal price, Integer quantity, String category) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -41,11 +41,11 @@ public class Product {
         this.category = category;
     }
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -13,9 +13,9 @@ import { ProductService } from '../../services/product.service';
   styleUrls: ['./category-view.component.scss'],
 })
 export class CategoryViewComponent implements OnInit {
-  categories: string[] = [];
+  categories: (string | null)[] = [];
   products: Product[] = [];
-  selectedCategory: string = '';
+  selectedCategory: string | null = '';
   maxPrice: number | null = null;
 
   constructor(private productService: ProductService) {}
@@ -28,8 +28,12 @@ export class CategoryViewComponent implements OnInit {
     this.productService.getProducts().subscribe({
       next: (products) => {
         this.products = products;
-        // Extract unique categories
-        this.categories = [...new Set(products.map((p) => p.category))];
+        // Extract unique categories, excluding null values
+        this.categories = [
+          ...new Set(
+            products.filter((p) => p.category !== null).map((p) => p.category)
+          ),
+        ];
 
         if (this.categories.length > 0 && !this.selectedCategory) {
           this.selectedCategory = this.categories[0];
@@ -94,7 +98,7 @@ export class CategoryViewComponent implements OnInit {
       });
   }
 
-  getCategoryProductCount(category: string): number {
+  getCategoryProductCount(category: string | null): number {
     return this.products.filter((p) => p.category === category).length;
   }
 

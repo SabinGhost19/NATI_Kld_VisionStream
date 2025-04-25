@@ -2,9 +2,7 @@ package com.sabinghost19.nati_kld_ml.service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 
 import com.sabinghost19.nati_kld_ml.model.ProductChange;
@@ -34,9 +32,6 @@ public class ProductService {
 
     // Create a new product
     public Product createProduct(Product product) {
-        if (product.getId() == null) {
-            product.setId(UUID.randomUUID());
-        }
 
         Product savedProduct = productRepository.save(product);
 
@@ -57,17 +52,23 @@ public class ProductService {
     }
 
     // Get all products
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<Product> getAllProducts(int page, int size) {
+        List<Product> allProducts = productRepository.findAll();
+        int start = page * size;
+        int end = Math.min(start + size, allProducts.size());
+        if (start > allProducts.size()) {
+            return new ArrayList<>();
+        }
+        return allProducts.subList(start, end);
     }
 
     // Get product by ID
-    public Optional<Product> getProductById(UUID id) {
+    public Optional<Product> getProductById(Long id) {
         return productRepository.findById(id);
     }
 
     // Update a product
-    public Product updateProduct(UUID id, Product productDetails) {
+    public Product updateProduct(Long id, Product productDetails) {
         Optional<Product> productOpt = productRepository.findById(id);
 
         if (productOpt.isPresent()) {
@@ -102,7 +103,7 @@ public class ProductService {
     }
 
     // Delete a product
-    public boolean deleteProduct(UUID id) {
+    public boolean deleteProduct(Long id) {
         Optional<Product> productOpt = productRepository.findById(id);
 
         if (productOpt.isPresent()) {
@@ -162,12 +163,12 @@ public class ProductService {
     }
 
     // Get product change history
-    public List<ProductChange> getProductChangeHistory(UUID productId) {
+    public List<ProductChange> getProductChangeHistory(Long productId) {
         return productChangeRepository.findByProductId(productId);
     }
 
     // Get product changes within a time range
-    public List<ProductChange> getProductChangesInTimeRange(UUID productId, Instant startTime, Instant endTime) {
+    public List<ProductChange> getProductChangesInTimeRange(Long productId, Instant startTime, Instant endTime) {
         return productChangeRepository.findByProductIdAndTimeRange(productId, startTime, endTime);
     }
 

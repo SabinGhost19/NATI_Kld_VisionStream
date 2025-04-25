@@ -1,10 +1,10 @@
 export interface Product {
-  id: string;
+  id: number;
   name: string;
-  description: string;
+  description: string | null;
   price: number;
   quantity: number;
-  category: string;
+  category: string | null;
 }
 
 export interface ProductChange {

@@ -1,10 +1,39 @@
-.loading,
-.error {
+.loading-indicator {
   padding: 2rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 1rem;
+    border: 4px solid rgba(63, 81, 181, 0.1);
+    border-left-color: #3f51b5;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  p {
+    margin: 0;
+    color: #757575;
+  }
 }
 
 .error {
+  padding: 2rem;
+  text-align: center;
   color: #c62828;
 
   p {

@@ -17,22 +17,22 @@ import java.util.List;
 @EnableCassandraRepositories(basePackages = "com.sabinghost19.nati_kld_ml.repository")
 public class CassandraConfig extends AbstractCassandraConfiguration {
 
-    @Value("${spring.data.cassandra.contact-points:localhost}")
+    @Value("${spring.cassandra.contact-points:localhost}")
     private String contactPoints;
 
-    @Value("${spring.data.cassandra.port:9042}")
+    @Value("${spring.cassandra.port:9042}")
     private int port;
 
-    @Value("${spring.data.cassandra.keyspace:products_keyspace}")
+    @Value("${spring.cassandra.keyspace:products_keyspace}")
     private String keyspace;
 
-    @Value("${spring.data.cassandra.username:cassandra}")
+    @Value("${spring.cassandra.username:cassandra}")
     private String username;
 
-    @Value("${spring.data.cassandra.password:cassandra}")
+    @Value("${spring.cassandra.password:cassandra}")
     private String password;
 
-    @Value("${spring.data.cassandra.local-datacenter:datacenter1}")
+    @Value("${spring.cassandra.local-datacenter:datacenter1}")
     private String datacenter;
 
     @Override
@@ -62,7 +62,8 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
                 .ifNotExists()
                 .with(KeyspaceOption.DURABLE_WRITES, true)
                 //simple replication for testing and using one datacenter
-                .withSimpleReplication(2);
+                //for every node increment it
+                .withSimpleReplication(1);
         return Collections.singletonList(specification);
     }
 

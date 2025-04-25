@@ -19,6 +19,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/products")
+@CrossOrigin(origins = "http://localhost:4200")
 public class ProductController {
 
     private final ProductService productService;
@@ -37,14 +38,16 @@ public class ProductController {
 
     // Get all products
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        List<Product> products = productService.getAllProducts();
+    public ResponseEntity<List<Product>> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        List<Product> products = productService.getAllProducts(page, size);
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
     // Get product by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable UUID id) {
+    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
         Optional<Product> product = productService.getProductById(id);
         return product.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -52,7 +55,7 @@ public class ProductController {
 
     // Update a product
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable UUID id, @RequestBody Product productDetails) {
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product productDetails) {
         Product updatedProduct = productService.updateProduct(id, productDetails);
         if (updatedProduct != null) {
             return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
@@ -62,7 +65,7 @@ public class ProductController {
 
     // Delete a product
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         boolean deleted = productService.deleteProduct(id);
         if (deleted) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -114,7 +117,7 @@ public class ProductController {
 
     // Get product change history
     @GetMapping("/{id}/history")
-    public ResponseEntity<List<ProductChange>> getProductChangeHistory(@PathVariable UUID id) {
+    public ResponseEntity<List<ProductChange>> getProductChangeHistory(@PathVariable Long id) {
         List<ProductChange> changes = productService.getProductChangeHistory(id);
         return new ResponseEntity<>(changes, HttpStatus.OK);
     }
@@ -122,7 +125,7 @@ public class ProductController {
     // Get product changes within a time range
     @GetMapping("/{id}/history/period")
     public ResponseEntity<List<ProductChange>> getProductChangesInTimeRange(
-            @PathVariable UUID id,
+            @PathVariable Long id,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date startTime,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date endTime) {
         Instant startInstant = startTime.toInstant();

@@ -14,21 +14,25 @@ import { ProductService } from '../../services/product.service';
 })
 export class ProductFormComponent implements OnInit {
   product: Product = {
-    id: '',
+    id: 0,
     name: '',
-    description: '',
+    description: null,
     price: 0,
     quantity: 0,
-    category: '',
+    category: null,
   };
   isEditing = false;
-  categories: string[] = [];
+  categories: (string | null)[] = [];
+  loading = true;
+  error: string | null = null;
 
   constructor(
     private productService: ProductService,
     private route: ActivatedRoute,
     private router: Router
-  ) {}
+  ) {
+    console.log('ProductFormComponent initialized');
+  }
 
   ngOnInit(): void {
     this.loadCategories();
@@ -37,46 +41,72 @@ export class ProductFormComponent implements OnInit {
     if (id) {
       this.isEditing = true;
       this.loadProduct(id);
+    } else {
+      this.loading = false;
     }
   }
 
   loadCategories(): void {
     this.productService.getProducts().subscribe({
       next: (products) => {
-        this.categories = [...new Set(products.map((p) => p.category))];
+        console.log('Categories loaded successfully');
+        this.categories = [
+          ...new Set(
+            products.filter((p) => p.category !== null).map((p) => p.category)
+          ),
+        ];
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
       },
     });
   }
 
   loadProduct(id: string): void {
+    this.loading = true;
+
     this.productService.getProduct(id).subscribe({
       next: (product) => {
+        console.log('Product loaded successfully for editing:', product);
         this.product = product;
+        this.loading = false;
       },
       error: (error) => {
         console.error('Error loading product:', error);
-        this.router.navigate(['/products']);
+        this.error = 'Nu s-a putut încărca produsul pentru editare.';
+        this.loading = false;
+        setTimeout(() => {
+          this.router.navigate(['/products']);
+        }, 3000);
       },
     });
   }
 
   saveProduct(): void {
+    this.loading = true;
+
     if (this.isEditing) {
       this.productService.updateProduct(this.product).subscribe({
         next: () => {
+          console.log('Product updated successfully');
           this.router.navigate(['/products', this.product.id]);
         },
         error: (error) => {
           console.error('Error updating product:', error);
+          this.error = 'Nu s-a putut actualiza produsul.';
+          this.loading = false;
         },
       });
     } else {
       this.productService.createProduct(this.product).subscribe({
         next: (product) => {
+          console.log('Product created successfully:', product);
           this.router.navigate(['/products', product.id]);
         },
         error: (error) => {
           console.error('Error creating product:', error);
+          this.error = 'Nu s-a putut crea produsul.';
+          this.loading = false;
         },
       });
     }

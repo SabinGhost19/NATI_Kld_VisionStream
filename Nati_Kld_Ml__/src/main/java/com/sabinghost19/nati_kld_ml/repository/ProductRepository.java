@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface ProductRepository extends CassandraRepository<Product, UUID> {
+public interface ProductRepository extends CassandraRepository<Product, Long> {
 
     List<Product> findByCategory(String category);
 

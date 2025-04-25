@@ -14,7 +14,7 @@ import java.util.UUID;
 public class ProductChange {
 
     @PrimaryKeyColumn(name = "product_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
-    private UUID productId;
+    private Long productId;
 
     @PrimaryKeyColumn(name = "change_timestamp", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
     private Instant changeTimestamp;
@@ -37,7 +37,7 @@ public class ProductChange {
     public ProductChange() {
     }
 
-    public ProductChange(UUID productId, Instant changeTimestamp, String operation,
+    public ProductChange(Long productId, Instant changeTimestamp, String operation,
                          BigDecimal priceOld, BigDecimal priceNew,
                          Integer quantityOld, Integer quantityNew) {
         this.productId = productId;
@@ -49,11 +49,11 @@ public class ProductChange {
         this.quantityNew = quantityNew;
     }
 
-    public UUID getProductId() {
+    public Long getProductId() {
         return productId;
     }
 
-    public void setProductId(UUID productId) {
+    public void setProductId(Long productId) {
         this.productId = productId;
     }
 
