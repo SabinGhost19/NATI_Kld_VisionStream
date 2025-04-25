@@ -1,5 +1,6 @@
 package com.sabinghost19.nati_kld_ml.repository;
 
+
 import com.sabinghost19.nati_kld_ml.model.Product;
 import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.data.cassandra.repository.Query;

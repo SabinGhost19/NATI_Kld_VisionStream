@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.sabinghost19</groupId>
-    <artifactId>Nati_Kld_ML</artifactId>
+    <artifactId>Nati_Kld_Ml</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Nati_Kld_ML</name>
-    <description>Nati_Kld_ML</description>
+    <name>Nati_Kld_Ml</name>
+    <description>Nati_Kld_Ml</description>
     <url/>
     <licenses>
         <license/>
