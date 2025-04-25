@@ -1,0 +1,116 @@
+<div class="card">
+  <h2>Products</h2>
+
+  <div class="filters">
+    <div class="filter-row">
+      <div class="form-group">
+        <label for="category">Filter by Category</label>
+        <select
+          id="category"
+          [(ngModel)]="selectedCategory"
+          (change)="filterByCategory()"
+        >
+          <option value="">All Categories</option>
+          <option *ngFor="let category of categories" [value]="category">
+            {{ category }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="minPrice">Min Price</label>
+        <input
+          type="number"
+          id="minPrice"
+          [(ngModel)]="minPrice"
+          min="0"
+          (change)="filterByPrice()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="maxPrice">Max Price</label>
+        <input
+          type="number"
+          id="maxPrice"
+          [(ngModel)]="maxPrice"
+          min="0"
+          (change)="filterByPrice()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="lowStock">Low Stock Threshold</label>
+        <input
+          type="number"
+          id="lowStock"
+          [(ngModel)]="lowStockThreshold"
+          min="1"
+          (change)="filterLowStock()"
+        />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-secondary" (click)="resetFilters()">
+        Reset Filters
+      </button>
+      <a [routerLink]="['/add-product']" class="btn">Add New Product</a>
+    </div>
+  </div>
+
+  <div *ngIf="products.length === 0" class="no-results">
+    <p>No products found. Try adjusting your filters or add a new product.</p>
+  </div>
+
+  <table *ngIf="products.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Category</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of products">
+        <td>{{ product.name }}</td>
+        <td>{{ product.description }}</td>
+        <td>
+          <span class="badge badge-primary">{{ product.category }}</span>
+        </td>
+        <td>{{ product.price | currency }}</td>
+        <td>
+          <span
+            [ngClass]="{
+              'badge badge-danger': product.quantity <= 5,
+              'badge badge-warning':
+                product.quantity > 5 && product.quantity <= 10
+            }"
+          >
+            {{ product.quantity }}
+          </span>
+        </td>
+        <td class="actions">
+          <button
+            class="btn btn-secondary btn-sm"
+            (click)="viewDetails(product.id)"
+          >
+            View
+          </button>
+          <a [routerLink]="['/edit-product', product.id]" class="btn btn-sm"
+            >Edit</a
+          >
+          <button
+            class="btn btn-danger btn-sm"
+            (click)="deleteProduct(product.id)"
+          >
+            Delete
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
