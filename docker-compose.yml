@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres-db_nkm
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: product_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_nkm:/var/lib/postgresql/data
+    # networks:
+    #   - nkm-network
+
+  cassandra:
+    image: cassandra:latest
+    container_name: cassandra-db_nkm
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra_data_nkm:/var/lib/cassandra
+    # networks:
+    #   - nkm-network
+
+# networks:
+#   nkm-network:
+#     driver: bridge
+
+volumes:
+  postgres_data_nkm:
+    external: true
+  cassandra_data_nkm:
+    external: true

@@ -1,0 +1,95 @@
+<div class="card">
+  <h2>{{ isEditing ? "Editare" : "Adăugare" }} Produs</h2>
+
+  <div *ngIf="loading" class="loading-indicator">
+    <div class="spinner"></div>
+    <p>
+      {{
+        isEditing ? "Se încarcă produsul..." : "Se inițializează formularul..."
+      }}
+    </p>
+  </div>
+
+  <div *ngIf="!loading">
+    <form (ngSubmit)="saveProduct()">
+      <div class="form-group">
+        <label for="name">Nume</label>
+        <input
+          type="text"
+          id="name"
+          [(ngModel)]="product.name"
+          name="name"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="description">Descriere</label>
+        <textarea
+          id="description"
+          [(ngModel)]="product.description"
+          name="description"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="category">Categorie</label>
+        <select
+          id="category"
+          [(ngModel)]="product.category"
+          name="category"
+          required
+        >
+          <option value="" disabled>Selectează o categorie</option>
+          <option *ngFor="let category of categories" [value]="category">
+            {{ category }}
+          </option>
+          <!-- Allow custom category input -->
+          <option value="new">Adaugă categorie nouă...</option>
+        </select>
+        <input
+          *ngIf="product.category === 'new'"
+          type="text"
+          [(ngModel)]="product.category"
+          name="newCategory"
+          placeholder="Introduceți categoria nouă"
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="price">Preț</label>
+          <input
+            type="number"
+            id="price"
+            [(ngModel)]="product.price"
+            name="price"
+            min="0"
+            step="0.01"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="quantity">Cantitate</label>
+          <input
+            type="number"
+            id="quantity"
+            [(ngModel)]="product.quantity"
+            name="quantity"
+            min="0"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancel()">
+          Anulare
+        </button>
+        <button type="submit" class="btn">Salvare</button>
+      </div>
+    </form>
+  </div>
+</div>

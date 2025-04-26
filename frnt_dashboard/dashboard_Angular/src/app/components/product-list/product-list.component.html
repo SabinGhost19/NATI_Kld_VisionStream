@@ -1,0 +1,154 @@
+<div class="card">
+  <h2>Produse</h2>
+
+  <div class="filters">
+    <div class="filter-row">
+      <div class="form-group">
+        <label for="category">Filtrare după categorie</label>
+        <select
+          id="category"
+          [(ngModel)]="selectedCategory"
+          (change)="filterByCategory()"
+        >
+          <option value="">Toate categoriile</option>
+          <option *ngFor="let category of categories" [value]="category">
+            {{ category }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="minPrice">Preț minim</label>
+        <input
+          type="number"
+          id="minPrice"
+          [(ngModel)]="minPrice"
+          min="0"
+          (change)="filterByPrice()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="maxPrice">Preț maxim</label>
+        <input
+          type="number"
+          id="maxPrice"
+          [(ngModel)]="maxPrice"
+          min="0"
+          (change)="filterByPrice()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="lowStock">Prag stoc redus</label>
+        <input
+          type="number"
+          id="lowStock"
+          [(ngModel)]="lowStockThreshold"
+          min="1"
+          (change)="filterLowStock()"
+        />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-secondary" (click)="resetFilters()">
+        Resetare filtre
+      </button>
+      <a [routerLink]="['/add-product']" class="btn">Adaugă produs nou</a>
+    </div>
+  </div>
+
+  <!-- Loading indicator -->
+  <div *ngIf="loading" class="loading-indicator">
+    <div class="spinner"></div>
+    <p>Se încarcă produsele...</p>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="error" class="alert alert-error">
+    <p>{{ error }}</p>
+    <button class="btn" (click)="loadProducts()">Reîncearcă</button>
+  </div>
+
+  <!-- No results message -->
+  <div *ngIf="!loading && !error && products.length === 0" class="no-results">
+    <p>
+      Nu s-au găsit produse. Încercați să ajustați filtrele sau adăugați un
+      produs nou.
+    </p>
+  </div>
+
+  <!-- Products table -->
+  <table *ngIf="!loading && !error && products.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Nume</th>
+        <th>Descriere</th>
+        <th>Categorie</th>
+        <th>Preț</th>
+        <th>Cantitate</th>
+        <th>Acțiuni</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of products">
+        <td>{{ product.name }}</td>
+        <td>{{ product.description || "Fără descriere" }}</td>
+        <td>
+          <span class="badge badge-primary">{{
+            product.category || "Necategorizat"
+          }}</span>
+        </td>
+        <td>{{ product.price | currency : "RON " }}</td>
+        <td>
+          <span
+            [ngClass]="{
+              'badge badge-danger': product.quantity <= 5,
+              'badge badge-warning':
+                product.quantity > 5 && product.quantity <= 10
+            }"
+          >
+            {{ product.quantity }}
+          </span>
+        </td>
+        <td class="actions">
+          <button
+            class="btn btn-secondary btn-sm"
+            (click)="viewDetails(product.id)"
+          >
+            Vizualizare
+          </button>
+          <a [routerLink]="['/edit-product', product.id]" class="btn btn-sm"
+            >Editare</a
+          >
+          <button
+            class="btn btn-danger btn-sm"
+            (click)="deleteProduct(product.id)"
+          >
+            Ștergere
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Load More button -->
+  <div
+    *ngIf="hasMoreProducts && !loading && products.length > 0"
+    class="load-more-container"
+  >
+    <button class="btn btn-primary" (click)="loadMoreProducts()">
+      Încarcă mai multe produse
+    </button>
+  </div>
+
+  <!-- Loading indicator for pagination -->
+  <div
+    *ngIf="loading && products.length > 0"
+    class="loading-indicator-pagination"
+  >
+    <div class="spinner"></div>
+    <p>Se încarcă mai multe produse...</p>
+  </div>
+</div>

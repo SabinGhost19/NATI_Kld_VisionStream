@@ -1,0 +1,82 @@
+<div class="card">
+  <h2>Products by Category</h2>
+
+  <div class="category-selection">
+    <div class="form-group">
+      <label for="category">Select Category</label>
+      <select
+        id="category"
+        [(ngModel)]="selectedCategory"
+        (change)="filterByCategory()"
+      >
+        <option *ngFor="let category of categories" [value]="category">
+          {{ category }} ({{ getCategoryProductCount(category) }})
+        </option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="maxPrice">Max Price</label>
+        <input
+          type="number"
+          id="maxPrice"
+          [(ngModel)]="maxPrice"
+          min="0"
+          step="0.01"
+        />
+      </div>
+
+      <div class="actions">
+        <button class="btn" (click)="filterByCategoryAndMaxPrice()">
+          Apply Filter
+        </button>
+        <button class="btn btn-secondary" (click)="resetFilters()">
+          Reset Filters
+        </button>
+        <button class="btn" (click)="getAvailableProductsByCategory()">
+          In Stock Only
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="products.length === 0" class="no-results">
+    <p>No products found in this category.</p>
+  </div>
+
+  <table *ngIf="products.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of products">
+        <td>{{ product.name }}</td>
+        <td>{{ product.description }}</td>
+        <td>{{ product.price | currency }}</td>
+        <td>
+          <span
+            [ngClass]="{
+              'badge badge-danger': product.quantity <= 5,
+              'badge badge-warning':
+                product.quantity > 5 && product.quantity <= 10
+            }"
+          >
+            {{ product.quantity }}
+          </span>
+        </td>
+        <td class="actions">
+          <a [routerLink]="['/products', product.id]" class="btn btn-sm"
+            >View</a
+          >
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
