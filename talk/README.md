@@ -1,11 +1,10 @@
 # NATI_Kld_VisionStream
 
-CE AM FACUT:
+## What I've Built So Far
 
-deci e un backend in spring boot pentru inserare,update, get etc
-adica e backendul principal care interactioneaza cu clusterul de baze de date cassandra
+I've developed a Spring Boot backend that handles insertion, updates, retrieval, and other operations. This serves as the main backend that interfaces with a Cassandra database cluster.
 
-ideea care este, ca eu am facut si am testat cu urmatoarele models:
+I've tested the system with the following data models (shown in TypeScript for simplicity, but implemented in Java as well):
 
 ```typescript
 export interface Product {
@@ -27,15 +26,11 @@ export interface ProductChange {
 }
 ```
 
-iti arat in typescript ca e mai usro de inteles si mai scurt dar am aceleasi models pe java
-eu docamdata inserez si fac get pe Cassandra la date de genul acesta insa,
-Cassandra e bun doar pentru inserare , de 100 de ori viteza de inserare mai rapida decat
-orice alta baza de date,la interogari simple la fel de rapid insa
-nu este absolut deloc buna la interogari complexe, joinuri, filtrari etc
-iar de asta am avea nevoie de o baza de date relationala: postgres my fav
+Currently, I'm inserting and retrieving this type of data from Cassandra. While Cassandra excels at data insertion (approximately 100x faster than other databases) and performs well with simple queries, it's not optimized for complex queries, joins, or filtering. This is why we need a relational database like PostgreSQL.
 
-ok in acest caz ar trebui sa schimb ce date stochez in cassandra adica altfel de date de tipul:
-În Cassandra (format orientat pe evenimente):
+## Proposed Data Structure Changes
+
+I need to modify the data stored in Cassandra to use an event-oriented format:
 
 ```json
 {
@@ -52,39 +47,31 @@ ok in acest caz ar trebui sa schimb ce date stochez in cassandra adica altfel de
 }
 ```
 
-adica e ca si cum cassandra e un fel de logger( pt new products sau update product) sa zic asa si e ft bun pt ca o sa inseram
-cate 500 000 de date pe 10 secunde adica 50.000 pe secunda nu?
+This positions Cassandra as an event logger (for product creation and updates), which is ideal since we'll be inserting approximately 50,000 records per second (500,000 records every 10 seconds).
 
-asa ca ceva de genul o sa intrea in cassandra si dupa mai avem nevoie de un backend
-pentru sincronizare cassandra-> postgres, cred ca tot in srping boot ca e cel mai robust
-si o sa functioneze cu Kafa adica cu cozi de mesaje pentru a fi real time si rapid
+## System Architecture
 
-adica:
-![Alt text](./image.png)
+![System Architecture](./image.png)
 
-DEci Postgres vom folosi pentru interogari : luam date din postgres chit ca sunt cu cateva secunde
-sau milisecunde neactualizate si le servim la backendul care se ocupa de ML unde va compara preturile si cantitatile
+We'll use PostgreSQL for complex queries: we'll retrieve data from PostgreSQL (even if it's a few seconds or milliseconds out of date) and serve it to the ML backend that compares prices and quantities.
 
-ok, de asta ma ocup eu sau ne consultam
-asta e strict backendul backendului si se axeaza pe persistenta datelor si
-acum ar trebui servite cat mai rapid si performant
+The system flow will work as follows:
 
-ideea este asa: cand datele vin in spring backend principal o sa se trimita in cassandra
-alt backend asculta , ia datele si le insereaza imediat si in postgres dupa ce sunt inserate in cassandra
-( postgres nu e bun la persistenta long term sa zic asa si nu e tolerant la defecte si scalabil
-iar asta e un motiv in plus de bagat si cassandra)
+1. Data enters the main Spring Boot backend
+2. Data is sent to Cassandra
+3. A secondary backend listens for these entries, retrieves them, and immediately inserts them into PostgreSQL after Cassandra insertion is complete
 
-# GABONE:
+This approach leverages Cassandra's strengths (high-speed insertion, fault tolerance, and scalability) while addressing PostgreSQL's limitations with long-term persistence and fault tolerance.
 
-ar trebui sa te documentezi putin despre KAFKA, ce este, cum se foloseste, la ce ajuta etc...
-cum se foloseste KFKA in python pentru ca atunci cand exista date noi de update la produse ( rezultate din
-procesarea ML-ului ) o sa imi trimiti mesaje intr-o coada iar eu din spring boot principal le iau si le inserez in bazele de date le actualizez
+## Next Steps
 
-pe langa asta sa te uiti la ML , la cel de detectie de obiecte in imagini, adica sa vina imagini si el sa le faca tag, acele date adica tagurile pe care le-a identificat se trimit la un alt serviciu in python tot de IA daca vrei
-care o sa compare:
+### For GABONE:
 
-1. tagurie primite si frecventa obiectului ( venite de la serviciul de IA img detection) din bufferul mare de imaginin
-2. datele deja existente in baza de date postgres
+You should research Kafka - what it is, how it's used, and its benefits. Specifically, look into how Kafka is used in Python, as when there are new product updates (resulting from ML processing), you'll need to send messages to a queue that my main Spring Boot backend will consume and use to update the databases.
 
-cand vede ca numele produsului concide ( nu 100% ) va face modificarea pretului
-si va trimite modificarea ( produsul nou, cu id cu tot ) prin Kafka catre backend pentru actualizare
+Additionally, explore ML for object detection in images. Images will be processed to generate tags, and these tags will be sent to another Python-based AI service that will:
+
+1. Compare the received tags and object frequency (from the image detection AI service) from the large image buffer
+2. Cross-reference with existing data in the PostgreSQL database
+
+When it identifies a matching product name (not necessarily an exact match), it will modify the price and send the update (the new product with its ID) through Kafka to the backend for database updates.
